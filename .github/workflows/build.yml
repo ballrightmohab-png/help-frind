@@ -135,3 +135,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: dist/LeviBoost.levipack
+          # Re-uploading a tag has to replace the previous asset, not silently
+          # keep the stale one.
+          overwrite_files: true
+          fail_on_unmatched_files: true
