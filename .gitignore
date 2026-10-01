@@ -1,0 +1,6 @@
+# build outputs
+build/
+*.o
+*.a
+
+# the packaged mod is committed in dist/ on purpose
