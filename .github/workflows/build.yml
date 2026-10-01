@@ -21,6 +21,16 @@ jobs:
             -o leviboost_tests
           ./leviboost_tests
 
+      - name: Run the tests under AddressSanitizer and UBSan
+        run: |
+          g++ -std=c++20 -O1 -g -Wall -Wextra -Wno-unused-parameter \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            -Isrc -Itests/stubs \
+            tests/optimizations_test.cpp src/Optimizations.cpp src/Settings.cpp \
+            -o leviboost_tests_san
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
+            ./leviboost_tests_san
+
   android:
     name: android arm64-v8a
     runs-on: ubuntu-latest

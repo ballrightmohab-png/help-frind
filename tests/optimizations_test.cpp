@@ -456,6 +456,13 @@ void TestRenderScale() {
           "an upscale target is created once");
     Check(LastCall("glViewport") != nullptr,
           "the engine's viewport is restored after the upscale");
+    Check(LastCall("glColorMask") != nullptr,
+          "the engine's colour mask is restored after the upscale");
+    Check(LastCall("glDepthMask") != nullptr,
+          "the engine's depth mask is restored after the upscale");
+    Check(LastCall("glBindTexture") != nullptr &&
+              LastCall("glBindTexture")->args[0] == 0.0,
+          "the engine's texture binding is restored after the upscale");
 
     // A frame that only renders UI at full size is left alone.
     ClearCalls();

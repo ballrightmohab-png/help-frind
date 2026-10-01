@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "leviboost",
+  "version": "1.0.0",
+  "minecraft_versions": [],
+  "info": {
+    "name": "LeviBoost",
+    "author": "ballrightmohab-png",
+    "description": "Ten switchable performance optimizations for Minecraft Bedrock on Android: FPS uncap and cap, render scaling, texture filtering and bandwidth cuts, MSAA removal, GL state call deduplication, glFinish removal and redundant clear skipping. Every optimization is a Mod Menu module that takes effect the moment you toggle it.",
+    "icon": "assets/icon.png",
+    "tags": [
+      "Performance",
+      "Utility"
+    ]
+  },
+  "release_assets": {
+    "include": [
+      "*.levipack",
+      "*.so"
+    ],
+    "labels": {
+      "LeviBoost.levipack": "LeviPack (install this)",
+      "libleviboost.so": "Native library"
+    }
+  }
+}

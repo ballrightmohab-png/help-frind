@@ -4,9 +4,24 @@ Ten performance optimizations for **Minecraft Bedrock on Android** running under
 [LeviLaunchroid / LeviLauncher](https://github.com/LiteLDev/LeviLaunchroid) — each
 one a real, switchable Mod Menu module.
 
-`dist/LeviBoost.levipack` is a preload-native mod: install it with the
-launcher's mod manager and the modules appear under **LeviBoost** in the in-game
-Mod Menu.
+## Download and install
+
+**Download `LeviBoost.levipack` from the
+[Releases page](https://github.com/ballrightmohab-png/help-frind/releases/latest).**
+It is also committed at [`dist/LeviBoost.levipack`](dist/LeviBoost.levipack).
+
+Then, in LeviLaunchroid:
+
+1. **Mods → Import / Add mod** (the `+` button) and pick `LeviBoost.levipack`.
+2. Launch Minecraft — the modules appear under **LeviBoost** in the in-game
+   Mod Menu, and a floating **LB** button opens the menu on the spot.
+
+> Do not use the *Actions* tab to get the mod: workflow artifacts can only be
+> downloaded by a signed-in GitHub account, and an unfinished build produces no
+> artifact at all. Releases are public and need no account.
+
+`LeviBoost.levipack` is a preload-native mod package (a zip holding
+`manifest.json`, `libleviboost.so` and `icon.png`).
 
 ## The ten optimizations
 

@@ -299,7 +299,8 @@ void UpscaleFrame(EGLDisplay display, EGLSurface surface) {
     GLint previousRead = 0;
     GLint viewport[4] = {0, 0, 0, 0};
     GLint scissor[4] = {0, 0, 0, 0};
-    GLboolean colorMask[4] = {GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE};
+    // GL_COLOR_WRITEMASK is a four element array of GLint callers provide.
+    GLint colorMask[4] = {1, 1, 1, 1};
     GLint depthMask = 1;
     GLint program = 0;
     GLint activeTexture = GL_TEXTURE0;
@@ -308,7 +309,7 @@ void UpscaleFrame(EGLDisplay display, EGLSurface surface) {
     g_api.glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousRead);
     g_api.glGetIntegerv(GL_VIEWPORT, viewport);
     g_api.glGetIntegerv(GL_SCISSOR_BOX, scissor);
-    g_api.glGetIntegerv(GL_COLOR_WRITEMASK, reinterpret_cast<GLint *>(colorMask));
+    g_api.glGetIntegerv(GL_COLOR_WRITEMASK, colorMask);
     g_api.glGetIntegerv(GL_DEPTH_WRITEMASK, &depthMask);
     g_api.glGetIntegerv(GL_CURRENT_PROGRAM, &program);
     g_api.glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
@@ -344,7 +345,10 @@ void UpscaleFrame(EGLDisplay display, EGLSurface surface) {
     g_api.glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
     g_api.glScissor(scissor[0], scissor[1], scissor[2], scissor[3]);
     if (g_api.glColorMask) {
-        g_api.glColorMask(colorMask[0], colorMask[1], colorMask[2], colorMask[3]);
+        g_api.glColorMask(colorMask[0] != 0 ? GL_TRUE : GL_FALSE,
+                          colorMask[1] != 0 ? GL_TRUE : GL_FALSE,
+                          colorMask[2] != 0 ? GL_TRUE : GL_FALSE,
+                          colorMask[3] != 0 ? GL_TRUE : GL_FALSE);
     }
     if (g_api.glDepthMask) {
         g_api.glDepthMask(depthMask != 0 ? GL_TRUE : GL_FALSE);
