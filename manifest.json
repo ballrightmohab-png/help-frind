@@ -1,0 +1,10 @@
+{
+  "type": "preload-native",
+  "name": "LeviBoost",
+  "author": "ballrightmohab-png",
+  "version": "1.0.0",
+  "description": "Ten switchable performance optimizations for Minecraft Bedrock on Android: FPS uncap and cap, render scaling, texture filtering and bandwidth cuts, MSAA removal, GL state call deduplication, glFinish removal and redundant clear skipping. Every optimization is a Mod Menu module that takes effect the moment you toggle it.",
+  "entry": "libleviboost.so",
+  "minecraft_versions": [],
+  "icon": "icon.png"
+}
