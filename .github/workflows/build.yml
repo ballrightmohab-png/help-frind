@@ -57,18 +57,52 @@ jobs:
             -DCMAKE_CXX_FLAGS="-Wl,-z,max-page-size=16384"
           cmake --build build/android --target leviboost
 
+      - name: Verify the library's linkage and preloader symbols
+        run: |
+          SO=build/android/out/arm64-v8a/libleviboost.so
+          echo "library size: $(stat -c%s "$SO") bytes"
+          echo "--- NEEDED ---"
+          readelf -d "$SO" | grep NEEDED
+
+          # The launcher process already has libc++_shared.so mapped, and the
+          # mod must use that same C++ runtime (never a private static copy).
+          if ! readelf -d "$SO" | grep -q 'libc++_shared.so'; then
+            echo "::error::libc++_shared.so is not in NEEDED"
+            exit 1
+          fi
+
+          # GL entry points are resolved at runtime, so a hard dependency on a
+          # GL library would mean the mod was linked against the wrong thing.
+          if readelf -d "$SO" | grep -Eq 'libEGL|libGLES'; then
+            echo "::error::the library hard-links a GL/EGL library"
+            exit 1
+          fi
+
+          # These have to stay undefined: libpreloader.so provides them at
+          # dlopen() time.
+          UNDEFINED=$(nm -u "$SO")
+          for symbol in \
+            _ZN2pl3mod9NativeMod7currentEv \
+            _ZN2pl6memory4hookEPvS1_PS1_NS0_12HookPriorityE \
+            _ZN2pl6memory6unhookEPvS1_ \
+            _ZN2pl7modmenu14registerModuleERKNS0_10ModuleInfoE \
+            _ZN2pl7modmenu14registerButtonERKNS0_10ButtonInfoE \
+            _ZN2pl7modmenu17getHudSurfaceSizeEv; do
+            if ! echo "$UNDEFINED" | grep -q "$symbol"; then
+              echo "::error::missing preloader symbol $symbol"
+              exit 1
+            fi
+          done
+          echo "--- undefined preloader (pl::) symbols ---"
+          echo "$UNDEFINED" | grep "_ZN2pl" | sort
+
       - name: Package the .levipack
         run: |
           python3 scripts/package_levipack.py \
             --library build/android/out/arm64-v8a/libleviboost.so \
             --output dist/LeviBoost.levipack
           python3 scripts/verify_levipack.py dist/LeviBoost.levipack
-
-      - name: Check which preloader symbols are required
-        run: |
-          readelf -d build/android/out/arm64-v8a/libleviboost.so | grep NEEDED
-          echo "--- undefined preloader (pl::) symbols ---"
-          nm -u build/android/out/arm64-v8a/libleviboost.so | grep "_ZN2pl" | sort
+          echo "package size: $(stat -c%s dist/LeviBoost.levipack) bytes"
 
       - uses: actions/upload-artifact@v4
         with:
