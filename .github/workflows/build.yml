@@ -7,6 +7,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Needed so the tag build can attach the finished .levipack to a release.
+permissions:
+  contents: write
+
 jobs:
   tests:
     name: host tests
