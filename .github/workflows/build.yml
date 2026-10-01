@@ -7,9 +7,11 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Needed so the tag build can attach the finished .levipack to a release.
+# Needed so the tag build can attach the finished .levipack to a release, and
+# so the build can publish its own size/flag summary as a commit status.
 permissions:
   contents: write
+  statuses: write
 
 jobs:
   tests:
@@ -54,6 +56,7 @@ jobs:
             -DANDROID_PLATFORM=android-28 \
             -DANDROID_STL=c++_shared \
             -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
             -DCMAKE_CXX_FLAGS="-Wl,-z,max-page-size=16384"
           cmake --build build/android --target leviboost
 
@@ -103,6 +106,23 @@ jobs:
             --output dist/LeviBoost.levipack
           python3 scripts/verify_levipack.py dist/LeviBoost.levipack
           echo "package size: $(stat -c%s dist/LeviBoost.levipack) bytes"
+
+      - name: Publish build stats
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SO=build/android/out/arm64-v8a/libleviboost.so
+          SIZE_SO=$(stat -c%s "$SO" 2>/dev/null || echo 0)
+          SIZE_PACK=$(stat -c%s dist/LeviBoost.levipack 2>/dev/null || echo 0)
+          OPT=$(grep -ohE '\-O[0-9sz]' build/android/compile_commands.json 2>/dev/null | sort -u | tr -d '\n' || true)
+          STD=$(grep -ohE '\-std=[a-z+0-9]+' build/android/compile_commands.json 2>/dev/null | sort -u | tr -d '\n' || true)
+          DBG=$(readelf -S "$SO" 2>/dev/null | grep -c '\.debug_' || true)
+          DESC="so=${SIZE_SO}B pack=${SIZE_PACK}B opt=${OPT:-?} std=${STD:-?} dbg=${DBG}"
+          echo "$DESC"
+          gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -f state=success -f context=leviboost-build-stats \
+            -f description="${DESC:0:140}" || true
 
       - uses: actions/upload-artifact@v4
         with:
