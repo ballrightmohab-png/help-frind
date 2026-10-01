@@ -118,7 +118,7 @@ jobs:
           OPT=$(grep -ohE '\-O[0-9sz]' build/android/compile_commands.json 2>/dev/null | sort -u | tr -d '\n' || true)
           STD=$(grep -ohE '\-std=[a-z+0-9]+' build/android/compile_commands.json 2>/dev/null | sort -u | tr -d '\n' || true)
           DBG=$(readelf -S "$SO" 2>/dev/null | grep -c '\.debug_' || true)
-          DESC="so=${SIZE_SO}B pack=${SIZE_PACK}B opt=${OPT:-?} std=${STD:-?} dbg=${DBG}"
+          DESC="so=${SIZE_SO}B pack=${SIZE_PACK}B opt=${OPT:-?} std=${STD:-?} debugSections=${DBG}"
           echo "$DESC"
           gh api "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
             -f state=success -f context=leviboost-build-stats \

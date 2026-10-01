@@ -103,6 +103,12 @@ target_compile_options(leviboost PRIVATE
         -fvisibility=hidden -fvisibility-inlines-hidden
         -fno-exceptions -fno-rtti>)
 
+# Keep the shipped library lean: drop debug sections and the symbols of any
+# static library that ends up linked in.  Neither affects the runtime, but the
+# .levipack is what users download.
+target_link_options(leviboost PRIVATE
+    $<$<COMPILE_LANG_AND_ID:CXX,Clang,GNU>:-Wl,--strip-debug -Wl,--exclude-libs,ALL>)
+
 # pl:: symbols are resolved at runtime from the libpreloader.so the launcher
 # already has loaded (RTLD_GLOBAL).  Link against the preloader target when it
 # is available so the dependency is explicit, otherwise leave the symbols
